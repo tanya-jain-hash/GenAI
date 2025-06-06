@@ -1,33 +1,4 @@
-import os
-from crewai import LLM, Agent
-from crewai.tools import tool
-from crewai.flow.flow import Flow, listen, start
-
-from ollama import chat
-from ollama import ChatResponse
-import asyncio
-
-
-
-llm = LLM(
-    model="ollama/tinyllama:1.1b",
-    base_url="http://localhost:11434"
-)
-
-
-class ExampleFlow(Flow):
-    # model = llm
-    
-    @start()
-    def get_query(self)->str:
-        query = input("Enter your query")
-        return query
-
-    @listen(get_query)
-    def get_response(self, get_query):
-        agent = Agent(role = "Intent classifier",
-                      name = "orchestrator",
-                      goal ="""
+orchestrator_template = """
                             Task: Identify the intent of the user query and classify it into one of the following:
                             - DELIVERY-AGENT
                             - SUPPORT AGENT
@@ -73,19 +44,18 @@ class ExampleFlow(Flow):
                             Do not answer user query. Only return the agent name [ one of DELIVERY-AGENT, SUPPORT AGENT, FAQ AGENT] for the present query only.
 
                             Answer: 
-                            """,
-                      backstory = "You work at a customer care for a logistics company and need to understand user's intent so the query can be transfered to the right agent",
-                      memory=True,
-                        llm=llm,
-                        reasoning=True
+                            """
 
-        )
-        result = agent.kickoff(get_query)
-        return result
-
-
-flow = ExampleFlow()
-# flow.plot()
-result = flow.kickoff_async()
-
-print(f"Generated fun fact: {result}")
+schema = """
+   "shipment" 
+   "id" int , 
+   "customer_name" text , 
+   "customer_mobile_no" int , 
+   "shipment_origin" text , 
+   "shipment_destination" text , 
+   "shipment_amount" int , 
+   "payment_status" text,
+   "payment_mode" text
+   "order_id" text
+   primary key: "id"
+"""				

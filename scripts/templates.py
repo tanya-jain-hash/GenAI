@@ -2,7 +2,6 @@ orchestrator_template = """
                             Task: Identify the intent of the user query and classify it into one of the following:
                             - DELIVERY-AGENT
                             - SUPPORT AGENT
-                            - FAQ AGENT
 
                             Refer to the following example scenarios to understand how to classify the user query.
                             Example:
@@ -16,7 +15,9 @@ orchestrator_template = """
                             4. query: "schedule a delivery to new york"
                             Answer: DELIVERY-AGENT
 
+                            delivery-agent is used to book package deliveries.
                             keywords: "book","delivery","pickup" etc.
+
 
                             SUPPORT-AGENT for following scenarios
                             1. query: "My package was supposed to arrive yesterday. Where is it?"
@@ -27,21 +28,12 @@ orchestrator_template = """
                             Asnwer: SUPPORT-AGENT
                             4. query: "The delivery agent was rude. How can I report this?"
                             Answer: SUPPORT-AGENT
+
+                            support-agent is used to answer the question relating to the package
                             keywords:  "where","miss","complaint","damage","report","raise" etc.
 
 
-                            FAQ-AGENT for following scenarios
-                            1. query: "What’s your policy on missed deliveries?"
-                            Answer: FAQ-AGENT
-                            2. query: "How do I track my shipment?"
-                            Answer: FAQ-AGENT
-                            3. query: "Are there any extra charges for COD orders?"
-                            Answer: FAQ-AGENT
-                            4. query: "Do you deliver on Sundays and public holidays?"
-                            Answer: FAQ-AGENT
-                            keyowrds: "policy", "how" etc.
-
-                            Do not answer user query. Only return the agent name [ one of DELIVERY-AGENT, SUPPORT AGENT, FAQ AGENT] for the present query only.
+                            Do not answer user query. Only return the agent name [ one of DELIVERY-AGENT, SUPPORT AGENT] for the present query only.
 
                             Answer: 
                             """

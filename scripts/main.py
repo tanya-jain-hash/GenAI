@@ -1,10 +1,22 @@
+import os
+
 from utility import convert_speech_to_text, load_model, convert_text_to_speech
 from delivery import main
+from templates import orchestrator_template
+from support import get_response
+
 from crewai import Agent
 from crewai.flow import Flow, start,listen, router
-from templates import orchestrator_template
+
 from pydantic import BaseModel
-from support import get_response
+from fastapi import FastAPI, status, HTTPException,Form, File, UploadFile
+from fastapi.responses import FileResponse
+from typing import Optional
+
+app = FastAPI()
+
+UPLOAD_DIR = "recordings"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 llm = load_model()
 
@@ -13,17 +25,8 @@ class RouterState(BaseModel):
     query: str = ""
 
 class AppFlow(Flow[RouterState]):
-    
-    @start()
-    def get_query(self)->str:
-        # query = input("Enter your query")
-        # query = convert_speech_to_text(r"C:\Users\Anoopkumarjain\Documents\git_reps\GenAI\documents\recordings\query_delivery.wav")
-        query = convert_speech_to_text(r"C:\Users\Anoopkumarjain\Documents\git_reps\GenAI\documents\recordings\query_support.wav")
-        print(f"============query:{query}==========")
-        self.query=query
-        # return query
 
-    @listen(get_query)
+    @start()
     def classify(self):
         agent = Agent(role = "Intent classifier",
                       name = "orchestrator",
@@ -34,7 +37,7 @@ class AppFlow(Flow[RouterState]):
                         reasoning=True
 
         )
-        result = agent.kickoff(self.query)
+        result = agent.kickoff(self.state.query)
         print(f"==============intent: {result.raw}============")
         if result.raw.lower() == "delivery-agent":
             self.state.router_flag="delivery-agent"
@@ -53,13 +56,45 @@ class AppFlow(Flow[RouterState]):
     def delivery_agent(self):
         order_id = main()
         convert_text_to_speech(f"Thank you! your order with order id {order_id} has been placed.","order_placed")
+        return "order_placed"
 
     @listen("support-agent")
     def support_agent(self):
         response = get_response(self.query)
         convert_text_to_speech(f"{response}", "response")
-        
-flow = AppFlow()
-result = flow.kickoff()
+        return "response"
 
-print(f"Generated fun fact: {result}")
+@app.post("/query")
+def start(text: Optional[str] = Form(None),
+    audio: Optional[UploadFile] = File(None)):
+    query = None
+
+    if text:
+        query = text
+
+    elif audio:
+        try:
+            filename = audio.filename
+            file_path = os.path.join('..', 'input_recordings',filename)
+        except:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        
+        query = convert_speech_to_text(file_path)
+        print(f"========{query}========")
+    else:
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, details="No query passed")
+
+    initial_state = RouterState(query=query)
+
+    # Pass it to the flow
+    flow = AppFlow(state=initial_state)
+    result = flow.kickoff()
+    result = "order_placed"
+
+    response_file_path = os.path.join('..', 'recordings', result + '.wav')
+    return FileResponse(response_file_path, media_type='audio/wav', filename=result+".wav")
+
+
+@app.get("test_api")
+def test_api():
+    return "API is working"

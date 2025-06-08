@@ -3,7 +3,7 @@ from crewai import LLM
 import scipy
 from transformers import AutoProcessor, BarkModel
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-
+import os
 from templates import schema
 
 processor = AutoProcessor.from_pretrained("suno/bark-small")
@@ -32,7 +32,7 @@ def convert_text_to_speech(text, file_name):
     audio_array = tts_model.generate(**inputs)
     audio_array = audio_array.cpu().numpy().squeeze()
     sample_rate = tts_model.generation_config.sample_rate
-    scipy.io.wavfile.write(f"{file_name}.wav", rate=sample_rate, data=audio_array)
+    scipy.io.wavfile.write(os.path.join('..', 'recordings', file_name + '.wav'), rate=sample_rate, data=audio_array)
 
 def insert_to_db(question):
     input_text = " ".join(["Question: ",question, "Schema:", schema])

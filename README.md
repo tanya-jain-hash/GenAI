@@ -9,7 +9,7 @@ A call begins with a synthesized agent greeting (via TTS), followed by the custo
 - Whisper (STT): Transcribes user responses into text.
 2. Intent Understanding & Routing
 - LLaMA 3.3 (via Ollama): Provides fast inference for intent detection and conversation flow.
-- AutoGen: Powers multi-agent orchestration for agent handover and workflow simulation.
+- CrewAI: Powers multi-agent orchestration for agent handover and workflow simulation.
 3. Natural Language to SQL
 - gaussalgo/T5-LM-Large-text2sql-spider: Converts natural queries into executable SQL statements.
 - SQLite (logistics_dummy.db): Stores shipment/customer data for query resolution.
@@ -24,7 +24,7 @@ A call begins with a synthesized agent greeting (via TTS), followed by the custo
 - LLaMA 3.3 (Ollama runtime for low-latency inference)
 - gaussalgo/T5-LM-Large-text2sql-spider (NL → SQL)
 4. Frameworks:
-- AutoGen (agentic framework)
+- CrewAI (agentic framework)
 - FastAPI (deployment)
 5. Database: SQLite (logistics_dummy.db)
 

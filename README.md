@@ -3,7 +3,7 @@ The GenAI Logistics Voice Agent simulates a real-world logistics customer servic
 
 A call begins with a synthesized agent greeting (via TTS), followed by the customer’s spoken response. This response is transcribed, analyzed for intent, and routed to the correct support agent. In addition, natural language queries can be converted to SQL to fetch relevant logistics data from a database.
 
-## Key Features
+## Key Features (Open-Source resources)
 1. Voice Interaction
 - SUMO Bark (TTS): Generates natural agent voices for greetings and responses.
 - Whisper (STT): Transcribes user responses into text.
